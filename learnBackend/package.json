@@ -1,0 +1,15 @@
+{
+  "name": "learnbackend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "keywords": [
+    "javascript",
+    "backend"
+  ],
+  "author": "yuvraj chaudhary",
+  "license": "ISC"
+}

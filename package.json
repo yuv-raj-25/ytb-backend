@@ -1,0 +1,20 @@
+{
+  "name": "basic-backend",
+  "version": "1.0.0",
+  "description": "a basic backend",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "keywords": [
+    "node",
+    "learn"
+  ],
+  "author": "yuvraj chaudhary",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.5.4"
+  }
+}
