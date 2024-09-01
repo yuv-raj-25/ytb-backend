@@ -32,11 +32,10 @@ const userSchema = mongoose.Schema({
     },
     avatar: {
         type: String,  // cloudinary url
-        required: true,
+        // required: true,
     },
     coverImage: {
         type: String, // cloudinary url
-        required: true,
     },
     watchHistory: [
         {
@@ -50,11 +49,11 @@ const userSchema = mongoose.Schema({
 
 },{timestamps: true})
 
-userSchema.pre("save" , async function(next){
+userSchema.pre("save" , async function (next) {
 
     if(!this.isModified("password")) return next()
 
-    this.password = bcrypt.hash(this.password , 10)
+    this.password =  bcrypt.hash(this.password , 10)
     next()
 })
 
