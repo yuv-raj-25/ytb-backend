@@ -1,4 +1,5 @@
 import {asyncHandler} from "../utilities/asyncHandler.js"
+import {asyncHandler} from "../utilities/asyncHandler.js"
 import {ApiError} from "../utilities/apiError.js"
 import { User } from "../models/user.models.js"
 import {uploadOnCloudinary} from "../utilities/cloudinary.js"
@@ -18,8 +19,10 @@ const generateAccessTokenAndRefreshToken = async(userId) => {
 
   } catch (error) {
     throw new ApiError(500 , "Something went wrong while generating the access & refresh token");
+
   }
 }
+
 
 
 
@@ -151,15 +154,15 @@ const loginUser = asyncHandler( async (req , res ) => {
 
    const loggedInUser = User.findById(user._id).select("-password -refreshToken")
 
-   const option = {
+   const options = {
     httpOnly: true,
     secure: true
    }
 
    return res
    .status(200)
-   .cookie("accessToken", accessToken , option)
-   .cookie("refreshToken", refreshToken , option)
+   .cookie("accessToken", accessToken , options)
+   .cookie("refreshToken", refreshToken , options)
    .json(
     new ApiResponse(
       200,
@@ -176,14 +179,38 @@ const loginUser = asyncHandler( async (req , res ) => {
 //1. clear the refresh token and access token 
 //2. clear cookies
 
-const logOut = asyncHandler(async (req , res) => {
+const logoutUser = asyncHandler(async (req , res) => {
+    await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $set: {
+          refreshToken: undefined
+        }
+      },
+      {
+        new: true
+      }
+    )  
 
-  
+    const options = {
+      httpOnly: true,
+      secure: true
+    }
+
+
+    return res
+    .status(201)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200 , {} , "User logged Out successfully"))
+    
+
 
 })
 
 
 export {
   registerUser,
-  loginUser
+  loginUser,
+  logoutUser
 }
