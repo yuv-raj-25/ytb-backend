@@ -184,33 +184,29 @@ const loginUser = asyncHandler(async (req, res) => {
 //1. clear the refresh token and access token 
 //2. clear cookies
 
-const logoutUser = asyncHandler(async (req , res) => {
-    await User.findByIdAndUpdate(
+const logoutUser = asyncHandler(async(req, res) => {
+  await User.findByIdAndUpdate(
       req.user._id,
       {
-        $set: {
-          refreshToken: undefined
-        }
+          $unset: {
+              refreshToken: 1 // this removes the field from document
+          }
       },
       {
-        new: true
+          new: true
       }
-    )  
+  )
 
-    const options = {
+  const options = {
       httpOnly: true,
       secure: true
-    }
+  }
 
-
-    return res
-    .status(201)
-    .clearCookie("accessToken", options)
-    .clearCookie("refreshToken", options)
-    .json(new ApiResponse(200 , {} , "User logged Out successfully"))
-    
-
-
+  return res
+  .status(200)
+  .clearCookie("accessToken", options)
+  .clearCookie("refreshToken", options)
+  .json(new ApiResponse(200, {}, "User logged Out"))
 })
 
 const refreshAccessToken  = asyncHandler( async (req ,  res ) => {
@@ -221,7 +217,7 @@ const refreshAccessToken  = asyncHandler( async (req ,  res ) => {
     throw new ApiError(401 , "unauthorized request ")
   }
   const decodeToken = jwt.verify(incomingRefreshToken , process.env.REFRESH_TOKEN_SECRET)
-  const user = User.findById(decodeToken?._id)
+  const user = await User.findById(decodeToken?._id)
 
   if(!user){
     throw new ApiError(400 , "Invalid Refrrsh Token ")
@@ -257,9 +253,14 @@ const changeCurrentPassword = asyncHandler( async (req , res) =>{
   const user  = await User.findById(req.user?._id)
   const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
 
-  if(!(isPasswordCorrect ===  oldPassword)){
+  if(!isPasswordCorrect){
     throw new ApiError(400 , "Invalid old Password" )
   }
+  
+  if (newPassword !== confirmPassword) {
+    throw new ApiError(400, "New password and confirm password do not match");
+  }
+
   user.password =  newPassword
   await user.save({validateBeforeSave: false})
 
